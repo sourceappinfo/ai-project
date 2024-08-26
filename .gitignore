@@ -1,6 +1,10 @@
-z
 # Virtual environment
 venv/
+
+# Ignore specific large files
+venv/lib/python3.12/site-packages/clang/native/libclang.dylib
+venv/lib/python3.12/site-packages/tensorflow/compiler/mlir/stablehlo/stablehlo_extension.so
+venv/lib/python3.12/site-packages/tensorflow/libtensorflow_cc.2.dylib
 
 # Python cache files
 __pycache__/
@@ -97,9 +101,20 @@ coverage.xml
 # Ignore Visual Studio Code settings folder
 .vscode/
 
+# Ignore Git Large File Storage (LFS) files
+*.bin
+*.tar
+*.gz
+*.zip
+*.rar
+*.7z
+*.tar.gz
 
-
-
-
-
+# Ignore large files generated during analysis
+*.dylib
+*.so
+*.pkl
+*.h5
+*.ckpt
+*.pt
 
