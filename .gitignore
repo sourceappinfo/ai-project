@@ -1,13 +1,98 @@
-# Ignore virtual environment
+# Virtual environment
 venv/
 
-# Ignore Python cache files
+# Python cache files
 __pycache__/
 *.pyc
 
-# Ignore macOS-specific files
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Log files
+*.log
+logs/
+
+# macOS-specific files
 .DS_Store
 
-# Ignore log files
-*.log
+# Ignore environment variable files
+.env
+
+# Ignore any file that might contain sensitive information
+*.env
+*.key
+
+# Ignore compiled Python files
+*.pyo
+*.pyd
+
+# Ignore model files if they are too large or can be generated
+models/*.h5
+models/*.pkl
+
+# Ignore data files
+data/raw/*
+data/processed/*
+
+# Ignore notebooks outputs
+notebooks/*.ipynb
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Ignore large TensorFlow or PyTorch model files if any
+*.h5
+*.ckpt
+*.pt
+
+# Ignore large binary files
+*.bin
+
+# Ignore large dataset files
+*.csv
+*.tsv
+*.xlsx
+*.xls
+
+# Ignore large image or video files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.mov
+
+# Ignore unnecessary archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Ignore mypy
+.mypy_cache/
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore Jupyter Notebook config
+.jupyter/
+
+# Ignore Sublime Text project files
+*.sublime-workspace
+*.sublime-project
+
+# Ignore Visual Studio Code settings folder
+.vscode/
 
