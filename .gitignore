@@ -15,49 +15,46 @@ logs/
 # macOS-specific files
 .DS_Store
 
-# Ignore environment variable files
+# Environment variable files (often contain sensitive information)
 .env
-
-# Ignore any file that might contain sensitive information
 *.env
 *.key
 
-# Ignore compiled Python files
+# Compiled Python files
 *.pyo
 *.pyd
 
-# Ignore model files if they are too large or can be generated
+# Model files (if too large or can be generated)
 models/*.h5
 models/*.pkl
-
-# Ignore data files
-data/raw/*
-data/processed/*
-
-# Ignore notebooks outputs (or specific extensions)
-notebooks/*.ipynb
-
-# Ignore temporary files
-*.tmp
-*.bak
-*.swp
-*~
-
-# Ignore large TensorFlow or PyTorch model files if any
 *.h5
 *.ckpt
 *.pt
+*.pkl
 
-# Ignore large binary files
-*.bin
-
-# Ignore large dataset files
+# Data files
+data/raw/*
+data/processed/*
 *.csv
 *.tsv
 *.xlsx
 *.xls
 
-# Ignore large image or video files
+# Notebook outputs
+notebooks/*.ipynb
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Large binary files
+*.bin
+*.dylib
+*.so
+
+# Image or video files
 *.png
 *.jpg
 *.jpeg
@@ -65,13 +62,13 @@ notebooks/*.ipynb
 *.mp4
 *.mov
 
-# Ignore unnecessary archives
+# Archives
 *.zip
 *.tar.gz
 *.rar
 *.7z
 
-# Ignore coverage reports
+# Coverage reports and caches
 htmlcov/
 .coverage
 .coverage.*
@@ -79,34 +76,16 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-
-# Ignore mypy
 .mypy_cache/
-
-# Ignore pytest cache
 .pytest_cache/
 
-# Ignore Jupyter Notebook config
+# Jupyter Notebook config
 .jupyter/
 
-# Ignore Sublime Text project files
+# IDE and editor settings
 *.sublime-workspace
 *.sublime-project
-
-# Ignore Visual Studio Code settings folder
 .vscode/
 
-# Ignore Git Large File Storage (LFS) files (Ensure these are tracked in .gitattributes)
-*.dylib
-*.so
-*.tar
-*.gz
-*.zip
-*.rar
-*.7z
-*.tar.gz
-*.pkl
-*.h5
-*.ckpt
-*.pt
+# Files managed by Git Large File Storage (LFS)
 
