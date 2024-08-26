@@ -1,25 +1,25 @@
 # Ignore virtual environment
 venv/
 
-# Python cache files
+# Ignore Python cache files
 __pycache__/
 *.pyc
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
+# Ignore macOS-specific files
+.DS_Store
 
-# Log files
+# Ignore log files
 *.log
 logs/
 
-# macOS-specific files
-.DS_Store
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
 
 # Ignore environment variable files
 .env
+*.env
 
 # Ignore any file that might contain sensitive information
-*.env
 *.key
 
 # Ignore compiled Python files
@@ -34,22 +34,9 @@ models/*.pkl
 data/raw/*
 data/processed/*
 
-# Ignore notebooks outputs (or specific extensions)
-notebooks/*.ipynb
-
-# Ignore temporary files
-*.tmp
-*.bak
-*.swp
-*~
-
-# Ignore large TensorFlow or PyTorch model files if any
-*.h5
-*.ckpt
-*.pt
-
 # Ignore large binary files
 *.bin
+*.dylib
 
 # Ignore large dataset files
 *.csv
@@ -95,18 +82,4 @@ coverage.xml
 
 # Ignore Visual Studio Code settings folder
 .vscode/
-
-# Ignore Git Large File Storage (LFS) files (Ensure these are tracked in .gitattributes)
-*.dylib
-*.so
-*.tar
-*.gz
-*.zip
-*.rar
-*.7z
-*.tar.gz
-*.pkl
-*.h5
-*.ckpt
-*.pt
 
