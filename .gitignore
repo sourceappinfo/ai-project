@@ -25,8 +25,6 @@ logs/
 *.pyd
 
 # Model files (if too large or can be generated)
-models/*.h5
-models/*.pkl
 *.h5
 *.ckpt
 *.pt
@@ -86,6 +84,4 @@ coverage.xml
 *.sublime-workspace
 *.sublime-project
 .vscode/
-
-# Files managed by Git Large File Storage (LFS)
 
