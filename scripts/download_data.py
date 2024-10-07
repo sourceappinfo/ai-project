@@ -4,11 +4,11 @@ import os
 import logging
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from retrying import retry  # You might need to install this package using pip
-import time
+from retrying import retry
+import pandas as pd
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 @retry(stop_max_attempt_number=3, wait_fixed=2000)
 def fetch_filing_history(cik):
@@ -37,8 +37,8 @@ def extract_def14a_urls(filing_history):
     return def14a_urls
 
 @retry(stop_max_attempt_number=3, wait_fixed=2000)
-def download_and_save_filing(cik, url, raw_data_dir):
-    """Download and save a single DEF 14A filing for a given CIK."""
+def download_and_save_filing(cik, url, raw_data_dir, extracted_data):
+    """Download and save a single DEF 14A filing for a given CIK and extract key data."""
     headers = {'User-Agent': 'SourceAppINC/1.0 (source.app.info@gmail.com)'}
     try:
         response = requests.get(url, headers=headers)
@@ -58,23 +58,34 @@ def download_and_save_filing(cik, url, raw_data_dir):
 
         logging.info(f"Saved filing for CIK {cik} from {url}")
 
+        # Extract key data for CSV
+        extracted_data.append({
+            'CIK': cik,
+            'URL': url,
+            'Filename': f"{cik}_{filing_name}.txt",
+            'Text_Length': len(filing_text)  # Example of extracting the text length
+        })
+
     except requests.exceptions.RequestException as e:
         logging.error(f"Error downloading filing from URL {url}: {e}")
         raise  # Re-raise exception to trigger retry
 
 def main():
-    """Main function to orchestrate the download process."""
+    """Main function to orchestrate the download and CSV creation process."""
     config_path = os.path.join('config', 'config.yaml')
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
 
     raw_data_dir = config['data']['raw_data_dir']
+    output_csv_path = config['data']['processed_data_path']
     ciks = config['sec']['cik_list']
 
     # Ensure the raw data directory exists
     os.makedirs(raw_data_dir, exist_ok=True)
 
-    with ThreadPoolExecutor(max_workers=5) as executor:  # Adjust number of workers as needed
+    extracted_data = []  # List to hold extracted data for CSV
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
         future_to_url = {}
         
         for cik in ciks:
@@ -84,7 +95,7 @@ def main():
                 def14a_urls = extract_def14a_urls(filing_history)
                 if def14a_urls:
                     for url in def14a_urls:
-                        future = executor.submit(download_and_save_filing, cik, url, raw_data_dir)
+                        future = executor.submit(download_and_save_filing, cik, url, raw_data_dir, extracted_data)
                         future_to_url[future] = url
                 else:
                     logging.info(f"No DEF 14A filings found for CIK {cik}.")
@@ -98,6 +109,10 @@ def main():
             except Exception as e:
                 logging.error(f"Error processing URL {url}: {e}")
 
+    # Convert the extracted data to a DataFrame and save to CSV
+    filings_df = pd.DataFrame(extracted_data)
+    filings_df.to_csv(output_csv_path, index=False)
+    logging.info(f"CSV file saved to {output_csv_path}")
+
 if __name__ == "__main__":
     main()
-

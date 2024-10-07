@@ -1,0 +1,28 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    level: INFO
+
+  file_handler:
+    class: logging.FileHandler
+    formatter: simple
+    filename: logs/application.log  # Ensure this path exists in your project
+    level: DEBUG
+
+loggers:
+  app_logger:
+    level: DEBUG
+    handlers: [console, file_handler]
+    propagate: no
+
+root:
+  level: INFO
+  handlers: [console]

@@ -1,5 +1,3 @@
-# Configuration file for SEC Filing Analysis AI project
-
 data:
   # Directory to store raw SEC filings
   raw_data_dir: 'data/raw'
@@ -95,7 +93,11 @@ logging:
       class: logging.StreamHandler
       formatter: simple
       level: INFO
+    file:
+      class: logging.FileHandler
+      filename: logs/app.log  # Save logs to a file
+      formatter: simple
+      level: INFO
   root:
     level: INFO
-    handlers: [console]
-
+    handlers: [console, file]  # Both console and file handlers

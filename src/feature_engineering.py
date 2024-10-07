@@ -1,55 +1,46 @@
-# src/feature_engineering.py
-
+import re
 import logging
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from patterns import get_pattern_terms
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+from .patterns import patterns
 
-def prepare_data_for_modeling(processed_data_path, text_column='text', label_column='label'):
-    """
-    Prepare data for machine learning modeling. This includes loading the data,
-    splitting it into training and testing sets, and vectorizing the text data.
-    """
-    logging.info(f"Loading processed data from {processed_data_path}")
-    data = pd.read_csv(processed_data_path)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    if text_column not in data.columns or label_column not in data.columns:
-        logging.error(f"Columns '{text_column}' or '{label_column}' not found in data.")
+def preprocess_text(text):
+    text = re.sub(r'\W+', ' ', text)
+    text = text.lower()
+    logging.debug(f"Preprocessed text: {text}")
+    return text
+
+def extract_features(data, config):
+    try:
+        data['text'] = data['text'].apply(preprocess_text)
+        vectorizer = CountVectorizer(max_features=config['nlp']['max_features'], 
+                                     stop_words=config['nlp']['stopwords'], 
+                                     min_df=config['nlp']['min_df'], 
+                                     max_df=config['nlp']['max_df'])
+        bag_of_words = vectorizer.fit_transform(data['text'])
+        tfidf_transformer = TfidfTransformer()
+        tfidf_matrix = tfidf_transformer.fit_transform(bag_of_words)
+        logging.info("Feature extraction completed successfully.")
+        return tfidf_matrix
+    except Exception as e:
+        logging.error(f"Error in feature extraction: {e}")
+        return None
+
+def prepare_data_for_modeling(data, target_column, test_size=0.2, random_state=42):
+    try:
+        X = data.drop(columns=[target_column])
+        y = data[target_column]
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+        logging.info("Data preparation for modeling completed successfully.")
+        return X_train, X_test, y_train, y_test
+    except Exception as e:
+        logging.error(f"Error in preparing data for modeling: {e}")
         return None, None, None, None
-
-    # Extract features and labels
-    X = data[text_column]
-    y = data[label_column]
-
-    # Split the data into training and testing sets
-    logging.info("Splitting data into training and testing sets...")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    logging.info("Data preparation complete.")
-
-    return X_train, X_test, y_train, y_test
-
-def vectorize_text_data(X_train, X_test):
-    """
-    Vectorize text data using TF-IDF vectorization.
-    """
-    logging.info("Vectorizing text data using TF-IDF...")
-    vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
-    X_train_vec = vectorizer.fit_transform(X_train)
-    X_test_vec = vectorizer.transform(X_test)
-
-    logging.info("Text vectorization complete.")
-    
-    return X_train_vec, X_test_vec, vectorizer
-
-if __name__ == "__main__":
-    # Example usage
-    processed_data_path = 'data/processed/sec_filings_processed.csv'  # Update path as needed
-    X_train, X_test, y_train, y_test = prepare_data_for_modeling(processed_data_path)
-    if X_train is not None and X_test is not None:
-        X_train_vec, X_test_vec, vectorizer = vectorize_text_data(X_train, X_test)
-

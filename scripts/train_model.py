@@ -12,12 +12,18 @@ import logging
 import os
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 def load_config(config_path='config/config.yaml'):
     """Load configuration from a YAML file."""
-    with open(config_path, 'r') as file:
-        return yaml.safe_load(file)
+    try:
+        with open(config_path, 'r') as file:
+            config = yaml.safe_load(file)
+        logging.info(f"Configuration loaded from {config_path}")
+        return config
+    except Exception as e:
+        logging.error(f"Error loading configuration: {e}")
+        return None
 
 def load_data(processed_data_path):
     """Load processed data from a CSV file."""
@@ -31,11 +37,17 @@ def load_data(processed_data_path):
     except pd.errors.EmptyDataError:
         logging.error(f"File is empty: {processed_data_path}")
         return None
+    except Exception as e:
+        logging.error(f"Error loading data: {e}")
+        return None
 
-def train_model(X_train, y_train):
+def train_model(X_train, y_train, config):
     """Train the model using a text classification pipeline."""
+    max_df = config['nlp'].get('max_df', 0.7)  # Default to 0.7 if not set in config
+    stop_words = config['nlp'].get('stopwords', 'english')
+
     pipeline = Pipeline([
-        ('tfidf', TfidfVectorizer(stop_words='english', max_df=0.7)),
+        ('tfidf', TfidfVectorizer(stop_words=stop_words, max_df=max_df)),
         ('clf', MultinomialNB())
     ])
 
@@ -49,7 +61,7 @@ def evaluate_model(pipeline, X_test, y_test):
     y_pred = pipeline.predict(X_test)
     report = classification_report(y_test, y_pred, digits=4)
     logging.info("Model evaluation complete.")
-    print(report)
+    logging.info("\n" + report)
     return report
 
 def save_model(pipeline, model_output_path):
@@ -61,6 +73,9 @@ def save_model(pipeline, model_output_path):
 def main():
     # Load the configuration
     config = load_config()
+    if config is None:
+        logging.error("Configuration loading failed. Exiting...")
+        return
 
     processed_data_path = config['data']['processed_data_path']
     model_output_path = config['model']['output_path']
@@ -71,7 +86,7 @@ def main():
         logging.error("Data loading failed. Exiting...")
         return
 
-    # Assuming 'text' is the column with the filing text and 'label' is the target variable
+    # Check if required columns exist
     if 'text' not in data.columns or 'label' not in data.columns:
         logging.error("Required columns 'text' or 'label' not found in data.")
         return
@@ -83,7 +98,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Train the model
-    pipeline = train_model(X_train, y_train)
+    pipeline = train_model(X_train, y_train, config)
 
     # Evaluate the model
     report = evaluate_model(pipeline, X_test, y_test)
@@ -93,4 +108,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

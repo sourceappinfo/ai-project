@@ -1,5 +1,3 @@
-# src/evaluate_model.py
-
 import os
 import pickle
 import logging
@@ -9,12 +7,10 @@ from sklearn.model_selection import train_test_split
 import yaml
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 def load_data(processed_data_path, feature_col='text', label_col='label'):
-    """
-    Load the processed data for evaluation.
-    """
+    """Load the processed data for evaluation."""
     if not os.path.exists(processed_data_path):
         logging.error(f"Processed data file not found at {processed_data_path}")
         return None, None
@@ -32,9 +28,7 @@ def load_data(processed_data_path, feature_col='text', label_col='label'):
     return X, y
 
 def load_model(model_path):
-    """
-    Load the trained machine learning model from a file.
-    """
+    """Load the trained machine learning model from a file."""
     if not os.path.exists(model_path):
         logging.error(f"Model file not found at {model_path}")
         return None
@@ -49,9 +43,7 @@ def load_model(model_path):
         return None
 
 def evaluate_model(model, X_test, y_test):
-    """
-    Evaluate the model using test data.
-    """
+    """Evaluate the model using test data."""
     if model is None or X_test is None or y_test is None:
         logging.error("Invalid model or test data.")
         return
@@ -75,7 +67,6 @@ def evaluate_model(model, X_test, y_test):
         logging.info("Classification Report:\n" + report)
         logging.info("Confusion Matrix:\n" + str(confusion))
 
-        # Return the metrics
         return {
             'accuracy': accuracy,
             'f1_score': f1,
@@ -87,8 +78,12 @@ def evaluate_model(model, X_test, y_test):
         logging.error(f"Error during model evaluation: {e}")
 
 def main():
-    # Load configuration
+    """Main function for evaluating the model."""
     config_path = os.path.join('config', 'config.yaml')
+    if not os.path.exists(config_path):
+        logging.error(f"Configuration file not found at {config_path}")
+        return
+
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
 
@@ -113,7 +108,6 @@ def main():
     # Evaluate the model
     evaluation_results = evaluate_model(model, X_test, y_test)
     if evaluation_results:
-        # Optionally, save evaluation results to a file
         evaluation_results_path = 'evaluation_results.txt'
         with open(evaluation_results_path, 'w') as f:
             for key, value in evaluation_results.items():
@@ -121,4 +115,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
